@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import { connectToDatabase } from './utils/db'
+import userRoutes from './routes/user.routes'
 
 dotenv.config()
 const app=express()
@@ -19,6 +20,7 @@ app.use(
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+  app.use('/api/v1/users', userRoutes);
 
 app.get('/', (req,res)=>{
     res.send("Hiie there..........!")
