@@ -1,26 +1,27 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
-const userschema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
-      Type: String,
+      type: String,
       required: true
     },
     email: {
-      Type: String,
+      type: String,
       required: true
     },
     password: {
-      Type: String,
+      type: String,
       required: true
     },
     role: {
-      Type: String,
+      type: String,
       enum: ["user", "admin"],
       default: "user"
     },
     isVerified: {
-      Type: Boolean,
+      type: Boolean,
       default: false
     },
     verificationToken: {
@@ -38,12 +39,13 @@ const userschema = mongoose.Schema(
   }
 );
 
-userschema.pre("save", async function (next) {
-    if(this.isModified("password")){
-        this.password = await bcrypt.hash(this.password, 10);
-    }
-})
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
 
-const User = mongoose.Model("User", userschema);
+const User = mongoose.model("User", userSchema);
 
 export default User;
