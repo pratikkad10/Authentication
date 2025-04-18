@@ -38,7 +38,8 @@ const register = async (req, res) => {
       user.email,
       "Email verification!",
       "click the following link to verify email",
-      `<a href="${process.env.BASE_URL}/api/v1/users/verify/${token}">Verify Your Account</a>`
+      // `<a href="${process.env.BASE_URL}/api/v1/users/verify/${token}">Verify Your Account</a>`
+      `Link: <a>${process.env.BASE_URL}/api/v1/users/verify/${token}</a>`
     );
 
     res.status(201).json({
@@ -160,8 +161,8 @@ const requestResetPassword = async (req, res) => {
       user.email,
       "Reset password",
       "To reset your password, click the link below:",
-      //send a link to frontend and use this api form there
-      // `<a href="${process.env.BASE_URL}/api/v1/users/reset-password/${token}">Reset Password</a>`
+      //send a link to frontend and use 
+      `<a ${process.env.BASE_URL}/api/v1/users/reset-password/${token}</a>`
     );
 
     res.status(200).json({ message: "Password reset email sent" });
@@ -214,4 +215,38 @@ const resetPasssword = async (req, res) => {
   }
 };
 
-export { register, verifyUser, login, resetPasssword, requestResetPassword };
+
+const getMe = async (req, res) => {
+  try {
+      const user = await User.findById(req.user.id).select('-password'); 
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      res.status(200).json({
+        success:true,
+        message:"Profile fetched",
+      });
+  } catch (error) {
+      res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
+const logout = async (req,res,next)=>{
+  try {
+    
+    res.cookie("token", "", { expires: new Date(0), httpOnly: true });
+
+    res.status(200).json({
+      success:true,
+      message:"User logged Out"
+    })
+  } catch (error) {
+    res.status(400).json({
+      message: "can.t logout",
+      error:error.message,
+      success: false
+    });
+  }
+}
+
+export { register, verifyUser, login, resetPasssword, requestResetPassword, getMe, logout };
